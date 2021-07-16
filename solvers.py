@@ -1,7 +1,7 @@
 import numpy as np
 import itertools
 
-class BackTrackSolver:
+    class BackTrackSolver:
 
     def __init__(self, max_depth=0):
         self.true_serie = np.arange(1, 10, 1)
@@ -9,7 +9,8 @@ class BackTrackSolver:
         self.n_depth = 0
         self.max_depth = max_depth
 
-    def test(self, puzzle):
+    @staticmethod
+    def test(puzzle):
         for ele in [puzzle.rows, puzzle.cols, puzzle.squares]:
             for x in ele:
                 vals = [i for i in x.flatten() if i != 0]
@@ -18,11 +19,13 @@ class BackTrackSolver:
                 else:
                     return True
 
-    def empty_boxes(self, puzzle):
+    @staticmethod
+    def empty_boxes(puzzle):
         return sorted([[x, y] for x, y in itertools.product(range(9), range(9))
                        if puzzle.rows[x][y] == 0])
 
-    def find_square(self, puzzle, x, y):
+    @staticmethod
+    def find_square(puzzle, x, y):
         return puzzle.squares[int(np.floor(x / 3) * 3 + np.floor(y / 3))]
 
     def possible_values(self, row, col, square):
