@@ -9,6 +9,7 @@ import itertools
         self.n_depth = 0
         self.max_depth = max_depth
 
+
     @staticmethod
     def test(puzzle):
         for ele in [puzzle.rows, puzzle.cols, puzzle.squares]:
@@ -16,8 +17,7 @@ import itertools
                 vals = [i for i in x.flatten() if i != 0]
                 if not len(set(vals)) == len(list(vals)):
                     return False
-                else:
-                    return True
+        return True
 
     @staticmethod
     def empty_boxes(puzzle):
