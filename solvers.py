@@ -1,7 +1,7 @@
 import numpy as np
 import itertools
 
-    class BackTrackSolver:
+class BackTrackSolver:
 
     def __init__(self, max_depth=0):
         self.true_serie = np.arange(1, 10, 1)
