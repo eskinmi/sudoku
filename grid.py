@@ -6,15 +6,6 @@ class Grid:
         self.original_grid = original_grid
         self.G = np.array(self.original_grid)
 
-    def test(self):
-        for ele in [self.rows, self.cols, self.squares]:
-            for x in ele:
-                vals = [i for i in x.flatten() if i != 0]
-                if not len(set(vals)) == len(list(vals)):
-                    return False
-                else:
-                    return True
-
     @property
     def rows(self):
         return self.G.swapaxes(1, 2).reshape(9, 9)
