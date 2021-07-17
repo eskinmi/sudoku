@@ -72,7 +72,7 @@ class BackTrackSolver:
         run = True
         while run:
             sol = self.solve(puzzle)
-            if solution:
+            if sol:
                 if self._grid_in_solutions(sol.G, np.array(solutions)):
                     run = False
                 else:
