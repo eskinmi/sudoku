@@ -17,7 +17,10 @@ class GridGen(Grid):
     def random_unit_generate(self):
         x,y = random.choice(self.solver.empty_boxes(self))
         values = self.solver.possible_values(self, x, y)
-        self.insert(random.choice(values), x, y)
+        if values:
+            self.insert(random.choice(values), x, y)
+        else:
+            self.revert_step()
 
     def generate(self):
         i = 0

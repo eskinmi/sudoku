@@ -29,12 +29,20 @@ class BackTrackSolver:
     def find_square(puzzle, x, y):
         return puzzle.squares[int(np.floor(x / 3) * 3 + np.floor(y / 3))]
 
+    def revert_step(self, puzzle):
+        _last_k = self.inserted[puzzle].keys()[-1]
+        _last_v = self.inserted[puzzle].values()[-1]
+        x,y = int(_last_k[0]), int(_last_k[-1])
+        puzzle.insert(_last_v, x,y)
+
     def possible_values(self, puzzle, x, y):
         if self._reorder_serie:
             inserted_to_index = [val for indices,val in self.inserted[puzzle].items()
                         if f'{x}-{y}' in i]
             val_rank = inserted_to_index[0] if inserted_to_index else 0
             true_serie = np.roll(self.true_serie, 9-val_rank)
+        else:
+            true_serie = self.true_serie
         values = [i for i in true_serie
                          if i not in puzzle.cols[y]
                          if i not in puzzle.rows[x]
@@ -43,7 +51,6 @@ class BackTrackSolver:
         return values
 
     def solve(self, puzzle):
-        self._reorder_serie = True
         self.inserted[puzzle] = dict()
         self.n_depth += 1
         if self.max_depth and self.n_depth > self.max_depth:
@@ -70,6 +77,7 @@ class BackTrackSolver:
             return False
 
     def find_all_solutions(self, puzzle, max_solutions=5):
+        self._reorder_serie = True
         solutions = []
         # add already tried solutions to the possible solutions
         run = True
@@ -87,4 +95,5 @@ class BackTrackSolver:
             else:
                 run = False
         self.inserted = {}
+        self._reorder_serie = False
         return solutions
