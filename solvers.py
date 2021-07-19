@@ -9,7 +9,7 @@ class BackTrackSolver:
         self.inserted = {}
         self.n_depth = 0
         self.max_depth = max_depth
-        self._reorder_serie = False
+        self.change_selection_order = False
 
     @staticmethod
     def test(puzzle):
@@ -20,6 +20,8 @@ class BackTrackSolver:
                     return False
         return True
 
+    # sort this to make the solver faster.
+    # sorting is based on the least amount of possibilities.
     @staticmethod
     def empty_boxes(puzzle):
         return sorted([[x, y] for x, y in itertools.product(range(9), range(9))
@@ -29,16 +31,10 @@ class BackTrackSolver:
     def find_square(puzzle, x, y):
         return puzzle.squares[int(np.floor(x / 3) * 3 + np.floor(y / 3))]
 
-    def revert_step(self, puzzle):
-        _last_k = self.inserted[puzzle].keys()[-1]
-        _last_v = self.inserted[puzzle].values()[-1]
-        x,y = int(_last_k[0]), int(_last_k[-1])
-        puzzle.insert(_last_v, x,y)
-
     def possible_values(self, puzzle, x, y):
-        if self._reorder_serie:
+        if self.change_selection_order:
             inserted_to_index = [val for indices,val in self.inserted[puzzle].items()
-                        if f'{x}-{y}' in i]
+                                 if f'{x}-{y}' in indices]
             val_rank = inserted_to_index[0] if inserted_to_index else 0
             true_serie = np.roll(self.true_serie, 9-val_rank)
         else:
@@ -51,7 +47,8 @@ class BackTrackSolver:
         return values
 
     def solve(self, puzzle):
-        self.inserted[puzzle] = dict()
+        if puzzle not in self.inserted:
+            self.inserted[puzzle] = dict()
         self.n_depth += 1
         if self.max_depth and self.n_depth > self.max_depth:
             print('max recursion depth is reached!')
@@ -63,6 +60,7 @@ class BackTrackSolver:
             box = boxes[0]
             x, y = box[0], box[1]
             possible_vals = self.possible_values(puzzle, x, y)
+            # print(possible_vals)
             for val in possible_vals:
                 puzzle.insert(val, x, y)
                 if self.test(puzzle):
@@ -77,7 +75,7 @@ class BackTrackSolver:
             return False
 
     def find_all_solutions(self, puzzle, max_solutions=5):
-        self._reorder_serie = True
+        self.change_selection_order = True
         solutions = []
         # add already tried solutions to the possible solutions
         run = True
@@ -89,11 +87,10 @@ class BackTrackSolver:
                     run = False
                 else:
                     solutions.append(sol)
-                    self.inserted[puzzle] = {} #reset
                 if len(solutions) >= max_solutions:
                     run = False
             else:
                 run = False
         self.inserted = {}
-        self._reorder_serie = False
+        self.change_selection_order = False
         return solutions
