@@ -2,7 +2,7 @@ import numpy as np
 import itertools
 
 
-class BackTrackSolver:
+class BackTrackSolver(Grid):
 
     def __init__(self, max_depth=0):
         self.true_serie = np.arange(1, 10, 1)
@@ -20,16 +20,12 @@ class BackTrackSolver:
                     return False
         return True
 
-    # sort this to make the solver faster.
-    # sorting is based on the least amount of possibilities.
     @staticmethod
     def empty_boxes(puzzle):
+        # sort this to make the solver faster.
+        # sorting is based on the least amount of possibilities.
         return sorted([[x, y] for x, y in itertools.product(range(9), range(9))
                        if puzzle.rows[x][y] == 0])
-
-    @staticmethod
-    def find_square(puzzle, x, y):
-        return puzzle.squares[int(np.floor(x / 3) * 3 + np.floor(y / 3))]
 
     def possible_values(self, puzzle, x, y):
         if self.change_selection_order:
@@ -42,11 +38,12 @@ class BackTrackSolver:
         values = [i for i in true_serie
                          if i not in puzzle.cols[y]
                          if i not in puzzle.rows[x]
-                         if i not in self.find_square(puzzle, x, y)
+                         if i not in puzzle.find_square(x, y)
                          if i != 0]
         return values
 
     def solve(self, puzzle):
+        super().__init__(puzzle)
         if puzzle not in self.inserted:
             self.inserted[puzzle] = dict()
         self.n_depth += 1
