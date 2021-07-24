@@ -1,5 +1,4 @@
 import numpy as np
-from solvers import BackTrackSolver
 import random
 
 
@@ -7,7 +6,6 @@ class Grid:
 
     def __init__(self, original_grid):
         self.original_grid = original_grid
-        assert isinstance(self.original_grid, list)
         self.G = np.array(self.original_grid)
 
     @property
@@ -53,9 +51,12 @@ def generate():
     :return:
         grid.Grid
     """
+    from grid import Grid
+    from solvers import BackTrackSolver
     # n_rounds = random.choice(range(17, 81))
     solver = BackTrackSolver()
-    pzl = make_empty_grid()
+    empty_grid = make_empty_grid()
+    pzl = Grid(empty_grid)
     n_rounds = 24
     x_prev, y_prev = None, None
     for ix in range(n_rounds):
