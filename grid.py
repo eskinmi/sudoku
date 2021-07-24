@@ -7,6 +7,7 @@ class Grid:
 
     def __init__(self, original_grid):
         self.original_grid = original_grid
+        assert isinstance(self.original_grid, list)
         self.G = np.array(self.original_grid)
 
     @property

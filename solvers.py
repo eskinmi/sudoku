@@ -1,5 +1,6 @@
 import numpy as np
 import itertools
+from grid import Grid
 
 
 class BackTrackSolver(Grid):
