@@ -6,9 +6,9 @@ from sudoku.solvers import BackTrackSolver
 class Grid(BackTrackSolver):
 
     def __init__(self, original_grid):
-        super().__init__(self)
         self.original_grid = original_grid
         self.G = np.array(self.original_grid)
+        super().__init__(self)
 
     @property
     def rows(self):
