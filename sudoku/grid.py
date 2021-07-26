@@ -47,18 +47,22 @@ def make_empty_grid():
     return np.zeros((3, 3, 3, 3), dtype='int64').tolist()
 
 
-def generate():
+def generate(difficulty:float = None):
     """
     Generate random Sudoku grid.
+        :param difficulty: difficulty level (float)
     :return:
         grid.Grid
     """
-    # from sudoku.grid import Grid
-    # from sudoku.solvers import BackTrackSolver
-    # n_rounds = random.choice(range(17, 81))
+    if difficulty is None:
+        n_rounds = random.choice(range(17, 81))
+    elif difficulty == 0:
+        n_rounds = random.choice(range(36, 81))
+    else:
+        n_rounds = random.choice(range(17, 36-int(18*difficulty)))
+
     empty_grid = make_empty_grid()
     pzl = Grid(empty_grid)
-    n_rounds = 33
     x_prev, y_prev = None, None
     for ix in range(n_rounds):
         print(f'round : {ix}')
@@ -71,7 +75,7 @@ def generate():
             return Grid(pzl.G.tolist())
         x_prev, y_prev = x, y
         grid = pzl.G.tolist()
-        if ix >= 18:
+        if ix >= 17:
             # print('searching for solutions...')
             sol = pzl.solve()
             pzl.reset_grid(grid)

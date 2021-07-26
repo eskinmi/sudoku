@@ -29,7 +29,7 @@ class BackTrackSolver:
 
     def possible_values(self, x, y):
         if self.change_selection_order:
-            inserted_to_index = [val for indices,val in self.inserted[self.puzzle].items()
+            inserted_to_index = [val for indices, val in self.inserted[self.puzzle].items()
                                  if f'{x}-{y}' in indices]
             val_rank = inserted_to_index[0] if inserted_to_index else 0
             true_serie = np.roll(self.true_serie, 9-val_rank)
