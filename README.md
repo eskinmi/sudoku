@@ -5,8 +5,8 @@ python script that solves and generates sudoku.
 =========================
 
 ```py
-from solvers import BackTrackSolver
-from grid import generate, sample_grids, Grid
+from sudoku.solvers import BackTrackSolver
+from sudoku.grid import generate, sample_grids, Grid
 
 puzzle = generate()
 # or to test: puzzle = Grid(sample_grids[0])

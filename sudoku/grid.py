@@ -51,8 +51,8 @@ def generate():
     :return:
         grid.Grid
     """
-    from grid import Grid
-    from solvers import BackTrackSolver
+    from sudoku.grid import Grid
+    from sudoku.solvers import BackTrackSolver
     # n_rounds = random.choice(range(17, 81))
     solver = BackTrackSolver()
     empty_grid = make_empty_grid()
