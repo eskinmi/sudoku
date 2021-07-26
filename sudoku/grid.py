@@ -56,16 +56,18 @@ def generate(difficulty:float = None):
     """
     if difficulty is None:
         n_rounds = random.choice(range(17, 81))
+        _test_start = random.choice(range(17, n_rounds+1))
     elif difficulty == 0:
         n_rounds = random.choice(range(36, 81))
+        _test_start = random.choice(range(36, n_rounds+1))
     else:
         n_rounds = random.choice(range(17, 36-int(18*difficulty)))
+        _test_start = random.choice(range(17, n_rounds+1))
 
     empty_grid = make_empty_grid()
     pzl = Grid(empty_grid)
     x_prev, y_prev = None, None
     for ix in range(n_rounds):
-        print(f'round : {ix}')
         x, y = random.choice(pzl.empty_boxes())
         values = pzl.possible_values(x, y)
         if values:
@@ -75,13 +77,12 @@ def generate(difficulty:float = None):
             return Grid(pzl.G.tolist())
         x_prev, y_prev = x, y
         grid = pzl.G.tolist()
-        if ix >= 17:
+        if ix >= _test_start:
             # print('searching for solutions...')
             sol = pzl.solve()
             pzl.reset_grid(grid)
             if not sol:
-                print('generation failed.')
-                return None
+                pzl.delete(x_prev, y_prev)
     return Grid(pzl.G.tolist())
 
 
