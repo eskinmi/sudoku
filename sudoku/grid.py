@@ -1,10 +1,12 @@
 import numpy as np
 import random
+from sudoku.solvers import BackTrackSolver
 
 
-class Grid:
+class Grid(BackTrackSolver):
 
     def __init__(self, original_grid):
+        super().__init__(self)
         self.original_grid = original_grid
         self.G = np.array(self.original_grid)
 
@@ -51,18 +53,17 @@ def generate():
     :return:
         grid.Grid
     """
-    from sudoku.grid import Grid
-    from sudoku.solvers import BackTrackSolver
+    # from sudoku.grid import Grid
+    # from sudoku.solvers import BackTrackSolver
     # n_rounds = random.choice(range(17, 81))
-    solver = BackTrackSolver()
     empty_grid = make_empty_grid()
     pzl = Grid(empty_grid)
-    n_rounds = 24
+    n_rounds = 33
     x_prev, y_prev = None, None
     for ix in range(n_rounds):
         print(f'round : {ix}')
-        x, y = random.choice(solver.empty_boxes(pzl))
-        values = solver.possible_values(pzl, x, y)
+        x, y = random.choice(pzl.empty_boxes())
+        values = pzl.possible_values(x, y)
         if values:
             pzl.insert(random.choice(values), x, y)
         else:
@@ -70,9 +71,9 @@ def generate():
             return Grid(pzl.G.tolist())
         x_prev, y_prev = x, y
         grid = pzl.G.tolist()
-        if ix >= 17:
+        if ix >= 18:
             # print('searching for solutions...')
-            sol = solver.solve(pzl)
+            sol = pzl.solve()
             pzl.reset_grid(grid)
             if not sol:
                 print('generation failed.')

@@ -5,14 +5,18 @@ python script that solves and generates sudoku.
 =========================
 
 ```py
-from sudoku.solvers import BackTrackSolver
-from sudoku.grid import generate, sample_grids, Grid
+from sudoku import grid
 
-puzzle = generate()
-# or to test: puzzle = Grid(sample_grids[0])
-solver = BackTrackSolver()
-solver.solve(puzzle)
+pzl = grid.generate()
+pzl.solve()
 
+# === or ===
+
+from sudoku import grid
+
+sample_grid = grid.sample_grids[1]
+pzl = grid.Grid(sample_grid)
+pzl.solve()
 
 array([[6, 7, 5, 9, 1, 2, 8, 4, 3],
        [1, 9, 3, 8, 4, 5, 6, 2, 7],
