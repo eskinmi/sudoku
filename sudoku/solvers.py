@@ -1,5 +1,7 @@
 import numpy as np
 import itertools
+import uuid
+import pulp as lp
 
 
 class BackTrackSolver:
@@ -42,7 +44,7 @@ class BackTrackSolver:
                   if i != 0]
         return values
 
-    def solve(self):
+    def run(self):
         self.n_depth += 1
         if self.max_depth and self.n_depth > self.max_depth:
             print('max recursion depth is reached!')
@@ -59,7 +61,7 @@ class BackTrackSolver:
                 self.puzzle.insert(val, x, y)
                 if self.test():
                     self.inserted[self.puzzle][f'{x}-{y}'] = val
-                    solved_puzzle = self.solve()
+                    solved_puzzle = self.run()
                     if solved_puzzle:
                         return solved_puzzle
                     else:
@@ -74,7 +76,7 @@ class BackTrackSolver:
         # add already tried solutions to the possible solutions
         run = True
         while run:
-            sol = self.solve()
+            sol = self.run()
             if sol:
                 if solutions and (sol.G == np.array([s.G for s in solutions])).all(axis=1).any():
                     # if solution is already found
@@ -87,3 +89,81 @@ class BackTrackSolver:
                 run = False
         self.change_selection_order = False
         return solutions
+
+
+class LPSolver:
+
+    def __init__(self, puzzle):
+        self.puzzle = puzzle
+        self.values = range(1, 10)
+        self.indices = range(0, 9)
+        self.problem_id = uuid.uuid4().hex
+        self.pr = lp.LpProblem(self.problem_id)
+        self._set_pseudo_objective()
+        self.vars = self._define_vars()
+        self._set_constraints()
+
+    def _set_pseudo_objective(self):
+        return self.pr.setObjective(lp.lpSum(0))
+
+    def _define_vars(self):
+        return lp.LpVariable.dicts("x_cell", (self.indices, self.indices, self.values), cat='Binary')
+
+    def _set_constraints(self):
+        for row in self.indices:
+            for col in self.indices:
+                self.pr.addConstraint(lp.LpConstraint(
+                    e=lp.lpSum([self.vars[row][col][value] for value in self.values]),
+                    sense=lp.LpConstraintEQ,
+                    rhs=1,
+                    name=f"constraint_sum_{row}_{col}"))
+
+        # CONSTRAINT 2: Constraint to ensure that values from 1 to 9 is filled only once in a row
+        for row in self.indices:
+            for value in self.values:
+                self.pr.addConstraint(lp.LpConstraint(
+                    e=lp.lpSum([self.vars[row][col][value] * value for col in self.indices]),
+                    sense=lp.LpConstraintEQ,
+                    rhs=value,
+                    name=f"constraint_unique_row_{row}_{value}"))
+
+        # CONSTRAINT 3: Constraint to ensure that values from 1 to 9 is filled only once in a column
+        for col in self.indices:
+            for value in self.values:
+                self.pr.addConstraint(lp.LpConstraint(
+                    e=lp.lpSum([self.vars[row][col][value] * value for row in self.indices]),
+                    sense=lp.LpConstraintEQ, rhs=value,
+                    name=f"constraint_unique_col_{col}_{value}"))
+
+        # CONSTRAINT 4: Constraint to ensure that values from 1 to 9 is filled only once in the 3x3 grid
+        for grid in self.indices:
+            grid_row = int(grid / 3)
+            grid_col = int(grid % 3)
+
+            for value in self.values:
+                self.pr.addConstraint(lp.LpConstraint(
+                    e=lp.lpSum([self.vars[grid_row * 3 + row][grid_col * 3 + col][value] * value
+                                for col in range(0, 3) for row in range(0, 3)]),
+                    sense=lp.LpConstraintEQ, rhs=value,
+                    name=f"constraint_unique_grid_{grid}_{value}"))
+
+        # Fill the prefilled values from input sudoku as constraints
+        for row in self.indices:
+            for col in self.indices:
+                if self.puzzle.rows[row][col] != 0:
+                    self.pr.addConstraint(
+                        lp.LpConstraint(e=lp.lpSum([self.vars[row][col][value] * value for value in self.values]),
+                                        sense=lp.LpConstraintEQ,
+                                        rhs=self.puzzle.rows[row][col],
+                                        name=f"constraint_pre_filled_{row}_{col}"))
+
+    def run(self):
+        self.pr.solve()
+        for row in self.indices:
+            for col in self.indices:
+                for value in self.values:
+                    if lp.value(self.vars[row][col][value]):
+                        self.puzzle.insert(value, row, col)
+        return self.puzzle
+
+

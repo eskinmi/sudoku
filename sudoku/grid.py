@@ -3,12 +3,11 @@ import random
 from sudoku.solvers import BackTrackSolver
 
 
-class Grid(BackTrackSolver):
+class Grid:
 
     def __init__(self, original_grid):
         self.original_grid = original_grid
         self.G = np.array(self.original_grid)
-        super().__init__(self)
 
     @property
     def rows(self):
@@ -36,6 +35,12 @@ class Grid(BackTrackSolver):
             grid = self.original_grid
         self.G = np.array(grid)
 
+    def solve(self):
+        if not self.solver_exists:
+            self.add_solver(BackTrackSolver)
+        self.solve()
+        return self
+
 
 def make_empty_grid():
     """
@@ -47,7 +52,7 @@ def make_empty_grid():
     return np.zeros((3, 3, 3, 3), dtype='int64').tolist()
 
 
-def generate(difficulty:float = None):
+def generate(difficulty: float = None):
     """
     Generate random Sudoku grid.
         :param difficulty: difficulty level (float)
